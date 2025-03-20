@@ -1,5 +1,6 @@
 package com.anaclaraaraujo.coursesapi.modules.users.controllers;
 
+import com.anaclaraaraujo.coursesapi.exceptions.ValidationException;
 import com.anaclaraaraujo.coursesapi.modules.users.UserRepository;
 import com.anaclaraaraujo.coursesapi.modules.users.entities.UserEntity;
 import jakarta.validation.Valid;
@@ -18,6 +19,11 @@ public class UserController {
 
     @PostMapping("/")
     public UserEntity create(@Valid @RequestBody UserEntity userEntity) {
+        this.userRepository.findByEmail(userEntity.getEmail())
+                .ifPresent(user -> {
+                    throw new ValidationException("Usuário já existente no banco de dados.");
+        });
+
         return this.userRepository.save(userEntity);
     }
 }
