@@ -23,20 +23,19 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     private String name;
-
-    @Email(message = "O campo [email] deve conter um e-mail válido")
     private String email;
-
-    @Length(min = 10, max = 100)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private RoleUser role;
 
+    @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 }
