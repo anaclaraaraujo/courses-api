@@ -1,12 +1,15 @@
 package com.anaclaraaraujo.coursesapi.modules.auth.useCases;
 
 import com.anaclaraaraujo.coursesapi.modules.auth.dto.CreateAuthRequest;
+import com.anaclaraaraujo.coursesapi.modules.auth.dto.CreateAuthResponse;
 import com.anaclaraaraujo.coursesapi.modules.users.UserRepository;
 import com.anaclaraaraujo.coursesapi.modules.users.entities.RoleUser;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,14 +32,14 @@ public class CreateAuthUseCase {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String execute(CreateAuthRequest createAuthRequest) {
+    public CreateAuthResponse execute(CreateAuthRequest createAuthRequest, RoleUser roleUser) {
         var user = this.userRepository.findByEmail(createAuthRequest.getEmail());
 
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("Email or password is incorrect");
         }
 
-        if (!user.get().getRole().equals(RoleUser.TEACHER)) {
+        if (!user.get().getRole().equals(roleUser)) {
             throw new UsernameNotFoundException("Email or password is incorrect");
         }
 
@@ -51,14 +54,23 @@ public class CreateAuthUseCase {
 
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
+        Map<String, String> claims = new HashMap<>();
+        claims.put("roles", roleUser.toString());
+
         String token = Jwts.builder()
                 .subject(user.get().getId().toString())
                 .issuer("courses")
                 .issuedAt(Date.from(issuedAt))
                 .expiration(Date.from(expiresIn))
+                .claims(claims)
                 .signWith(key)
                 .compact();
-        return token;
+
+        return CreateAuthResponse.builder()
+                .token(token)
+                .created_at(Date.from(issuedAt))
+                .expires_in(Date.from(expiresIn))
+                .build();
     }
 
 }
