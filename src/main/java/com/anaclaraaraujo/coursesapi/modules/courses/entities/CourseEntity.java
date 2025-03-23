@@ -1,7 +1,7 @@
-package com.anaclaraaraujo.coursesapi.modules.users.entities;
+package com.anaclaraaraujo.coursesapi.modules.courses.entities;
 
+import com.anaclaraaraujo.coursesapi.modules.users.entities.UserEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,18 +17,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Entity(name = "users")
-public class UserEntity {
+@Entity(name = "courses")
+public class CourseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String name;
-    private String email;
-    private String password;
+    private String title;
+    private String description;
 
-    @Enumerated(EnumType.STRING)
-    private RoleUser role;
+    @ManyToOne
+    @JoinColumn(name = "instructor_id", updatable = false, insertable = false)
+    private UserEntity instructor;
+
+    @Column(name = "instructor_id")
+    private UUID instructorId;
 
     @Column(name = "created_at")
     @CreationTimestamp
