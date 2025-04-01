@@ -13,6 +13,7 @@ public class CreateCourseUseCase {
 
     @Autowired
     private CourseRepository courseRepository;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -21,14 +22,17 @@ public class CreateCourseUseCase {
             throw new Exception("Professor(a) não encontrado");
         }
 
-        if(createCourseRequest.getDescription() == null || createCourseRequest.getTitle().isEmpty()) {
-            throw new ValidationException("Nome e títulos são obrigatórios");
+        if (createCourseRequest.getTitle() == null || createCourseRequest.getTitle().isEmpty() ||
+                createCourseRequest.getDescription() == null || createCourseRequest.getDescription().isEmpty()) {
+            throw new ValidationException("Título e descrição são obrigatórios");
         }
 
         CourseEntity courseEntity = CourseEntity.builder()
-                .description(createCourseRequest.getDescription())
                 .title(createCourseRequest.getTitle())
+                .description(createCourseRequest.getDescription())
                 .instructorId(createCourseRequest.getInstructorId())
+                .category(createCourseRequest.getCategory())
+                .active(true)
                 .build();
 
         courseEntity = this.courseRepository.save(courseEntity);

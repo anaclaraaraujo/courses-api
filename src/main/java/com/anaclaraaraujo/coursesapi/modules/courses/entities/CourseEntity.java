@@ -26,6 +26,12 @@ public class CourseEntity {
     private String title;
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private CourseCategory category;
+
+    @Builder.Default
+    private boolean active = true;
+
     @ManyToOne
     @JoinColumn(name = "instructor_id", updatable = false, insertable = false)
     private UserEntity instructor;
